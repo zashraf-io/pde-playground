@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDE Playground — Interactive Heat &amp; Wave PDE Simulator</title>
+    <meta name="description" content="Interactive browser-based PDE Playground for simulating 1D and 2D Heat diffusion, Wave propagation, finite-difference numerical methods (FTCS, BTCS, Crank-Nicolson), and 13 PDE graphs with downloadable Python Matplotlib scripts.">
+    <meta name="keywords" content="PDE Playground, partial differential equations simulator, heat equation visualization, wave equation simulator, D'Alembert wave, finite difference FTCS BTCS Crank-Nicolson, interactive math visualization, Matplotlib PDE scripts">
+    <meta name="author" content="PDE Playground">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="PDE Playground — Interactive Heat &amp; Wave PDE Simulator">
+    <meta property="og:description" content="Explore 1D/2D Heat diffusion, Wave propagation, animated FTCS/BTCS/Crank-Nicolson finite-difference solvers, and 13 PDE graphs with downloadable Python code.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="assets/home_light.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PDE Playground — Interactive Heat &amp; Wave PDE Simulator">
+    <meta name="twitter:description" content="Interactive 1D/2D Heat &amp; Wave PDE visualizer, finite-difference simulator, and downloadable Matplotlib scripts.">
+    <meta name="twitter:image" content="assets/home_light.png">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Georgia,serif' font-size='36' font-weight='bold'%3E%E2%88%82%3C/text%3E%3C/svg%3E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js" charset="utf-8"></script>
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ====================================================================
+         GLOBAL TOP NAVIGATION
+         ==================================================================== -->
+    <header class="top-nav">
+        <div class="top-nav-inner">
+            <button class="brand-btn" data-nav="home" aria-label="PDE Playground Home">
+                <span class="brand-mark">
+                    <i data-lucide="waves" style="width:18px;height:18px;"></i>
+                </span>
+                <span class="brand-name">PDE Playground</span>
+            </button>
+
+            <nav class="nav-links" aria-label="Primary sections">
+                <button class="nav-pill active" data-nav="home">
+                    <i data-lucide="layout-grid"></i><span>Home</span>
+                </button>
+                <button class="nav-pill" data-nav="heat">
+                    <i data-lucide="flame"></i><span>Heat Equation</span>
+                </button>
+                <button class="nav-pill" data-nav="wave">
+                    <i data-lucide="activity"></i><span>Wave Equation</span>
+                </button>
+                <button class="nav-pill" data-nav="graphs">
+                    <i data-lucide="line-chart"></i><span>Graphs</span>
+                </button>
+            </nav>
+
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Light and Dark theme">
+                    <i data-lucide="moon" id="theme-icon"></i>
+                    <span id="theme-label">Dark</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-shell">
+
+        <!-- ================================================================
+             VIEW 1: OUTER HOMESCREEN
+             ================================================================ -->
+        <section id="view-home" class="view-section active">
+            <div class="home-hero">
+                <div class="hero-eyebrow">
+                    <span class="dot"></span>
+                    Interactive Partial Differential Equations Playground
+                </div>
+                <h1>Interactive PDE Visualization &amp; Numerical Lab</h1>
+                <p>Explore parabolic heat diffusion, hyperbolic wave propagation, finite-difference time-stepping simulations, and classic PDE graphs with downloadable Python scripts.</p>
+                <div class="hero-eq-strip">
+                    <div class="eq-chip heat">
+                        <span class="eq-tag">Parabolic</span>
+                        <span class="katex-inline" data-tex="\frac{\partial u}{\partial t} = \beta\nabla^2 u + f">∂u/∂t = β∇²u + f</span>
+                    </div>
+                    <div class="eq-chip wave">
+                        <span class="eq-tag">Hyperbolic</span>
+                        <span class="katex-inline" data-tex="\frac{\partial^2 u}{\partial t^2} = c^2\nabla^2 u">∂²u/∂t² = c²∇²u</span>
+                    </div>
+                    <div class="eq-chip num">
+                        <span class="eq-tag">Finite Difference</span>
+                        <span class="katex-inline" data-tex="\lambda = \frac{\beta\Delta t}{\Delta x^2}">λ = βΔt / Δx²</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-cards-grid">
+                <!-- Card 1: Heat -->
+                <button class="portal-card heat" data-nav="heat">
+                    <div class="portal-card-top">
+                        <div class="portal-icon"><i data-lucide="flame"></i></div>
+                        <span class="portal-badge">1D · 2D · Numerical</span>
+                    </div>
+                    <h2>Heat Equation Simulator</h2>
+                    <p>Simulate 1D rods and 2D plates with Dirichlet, Neumann, and Robin boundaries and live heat flux arrows, then switch to the animated Numerical Simulation to compare FTCS, BTCS, and Crank–Nicolson step-by-step.</p>
+                    <ul class="portal-features">
+                        <li><i data-lucide="check"></i>1D Thin Rod &amp; 2D Plate with clear heat flux arrows</li>
+                        <li><i data-lucide="check"></i>Animated FTCS, BTCS &amp; Crank–Nicolson grid simulation</li>
+                        <li><i data-lucide="check"></i>Live stability gauge (λ &le; 0.5) &amp; error diagnostics</li>
+                    </ul>
+                    <span class="portal-cta">
+                        <span>Open Heat Simulator</span>
+                        <i data-lucide="arrow-right"></i>
+                    </span>
+                </button>
+
+                <!-- Card 2: Wave -->
+                <button class="portal-card wave" data-nav="wave">
+                    <div class="portal-card-top">
+                        <div class="portal-icon"><i data-lucide="activity"></i></div>
+                        <span class="portal-badge">1D String · 2D Water Ripples</span>
+                    </div>
+                    <h2>Wave Equation Simulator</h2>
+                    <p>Explore standing normal modes, plucked and struck strings, D'Alembert traveling-wave decomposition, and shaded 2D water-surface wave ripples in real time.</p>
+                    <ul class="portal-features">
+                        <li><i data-lucide="check"></i>D'Alembert ½f(x−ct) + ½f(x+ct) live overlay</li>
+                        <li><i data-lucide="check"></i>Standing modes, spacetime rays &amp; energy plots</li>
+                        <li><i data-lucide="check"></i>Shaded 2D water-ripple crests, troughs &amp; 3D surface</li>
+                    </ul>
+                    <span class="portal-cta">
+                        <span>Open Wave Simulator</span>
+                        <i data-lucide="arrow-right"></i>
+                    </span>
+                </button>
+
+                <!-- Card 3: Graphs -->
+                <button class="portal-card graphs" data-nav="graphs">
+                    <div class="portal-card-top">
+                        <div class="portal-icon"><i data-lucide="line-chart"></i></div>
+                        <span class="portal-badge">13 Figures · .py Code</span>
+                    </div>
+                    <h2>Graphs</h2>
+                    <p>Browse 13 essential Heat, Wave, Fourier, and Finite Difference figures—rendered interactively with a 1-click button beside every graph to download its standalone Python script.</p>
+                    <ul class="portal-features">
+                        <li><i data-lucide="check"></i>Harmonic damping, 3D decay &amp; non-homogeneous BCs</li>
+                        <li><i data-lucide="check"></i>Normal modes, D'Alembert split &amp; Gibbs phenomenon</li>
+                        <li><i data-lucide="check"></i>Clean NumPy + Matplotlib .py download per graph</li>
+                    </ul>
+                    <span class="portal-cta">
+                        <span>Browse Graphs &amp; Code</span>
+                        <i data-lucide="arrow-right"></i>
+                    </span>
+                </button>
+            </div>
+
+            <div class="home-summary-strip">
+                <div class="summary-cell">
+                    <h4>Parabolic Diffusion (Heat)</h4>
+                    <p>Smooths discontinuities instantly; higher Fourier modes decay exponentially as exp(−β n²π²t/L²).</p>
+                </div>
+                <div class="summary-cell">
+                    <h4>Hyperbolic Propagation (Wave)</h4>
+                    <p>Conserves total mechanical energy (when undamped) and propagates signals at finite wave speed c.</p>
+                </div>
+                <div class="summary-cell">
+                    <h4>Finite Difference Stability</h4>
+                    <p>Explicit FTCS requires λ = βΔt/Δx² ≤ 0.5 in 1D; Implicit BTCS and Crank–Nicolson are unconditionally stable.</p>
+                </div>
+            </div>
+
+            <footer class="home-footer">
+                Developed for <strong>MTH G202: Special Functions and Partial Differential Equations</strong> · Department of Biomedical Engineering, Faculty of Engineering, Cairo University.
+            </footer>
+        </section>
+
+        <!-- ================================================================
+             VIEW 2: HEAT EQUATION STUDIO
+             ================================================================ -->
+        <section id="view-heat" class="view-section">
+            <div class="view-header">
+                <div class="view-title-group">
+                    <h1>Heat Equation Simulator</h1>
+                    <p>Parabolic thermal diffusion in 1D &amp; 2D plus an animated finite-difference solver simulation.</p>
+                </div>
+                <div class="segmented-tabs" role="tablist">
+                    <button class="seg-tab active" data-heat-tab="interactive">
+                        <i data-lucide="flame"></i><span>Interactive Physics (1D / 2D)</span>
+                    </button>
+                    <button class="seg-tab" data-heat-tab="numerical">
+                        <i data-lucide="grid-3x3"></i><span>Numerical Simulation</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SUB-VIEW 2A: INTERACTIVE PHYSICS -->
+            <div id="heat-pane-interactive">
+                <div class="presets-row">
+                    <span class="presets-label">Presets</span>
+                    <button class="preset-chip active" data-heat-preset="dirichlet_zero">Dirichlet Zero Ends</button>
+                    <button class="preset-chip" data-heat-preset="neumann_insulated">Insulated Neumann Step</button>
+                    <button class="preset-chip" data-heat-preset="robin_cooling">Robin Convective Cooling</button>
+                    <button class="preset-chip" data-heat-preset="lecture_harmonics">Fourier Harmonics</button>
+                    <button class="preset-chip" data-heat-preset="heat_source">Center Heat Source</button>
+                    <button class="preset-chip" data-heat-preset="plate_2d">2D Square Plate</button>
+                </div>
+
+                <div class="workspace-grid">
+                    <aside class="panel-card controls-sidebar">
+                        <div class="sidebar-section">
+                            <span class="section-label">Domain &amp; Diffusivity</span>
+                            <div class="toggle-pair" id="heat-dim-toggle">
+                                <button class="toggle-btn active" data-value="1d">1D Rod</button>
+                                <button class="toggle-btn" data-value="2d">2D Plate</button>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-header">
+                                    <span>Diffusivity β</span>
+                                    <span class="field-value" id="heat-beta-val">0.0100</span>
+                                </div>
+                                <input type="range" id="heat-beta-slider" min="-3" max="-0.7" step="0.05" value="-2">
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <span class="section-label">Boundary Conditions</span>
+                            <select class="select-input" id="heat-bc-select">
+                                <option value="dirichlet">Dirichlet (Fixed Temperature)</option>
+                                <option value="neumann">Neumann (Insulated / Flux)</option>
+                                <option value="robin">Robin (Newton Cooling)</option>
+                            </select>
+                            <div id="heat-bc-params" class="bc-grid"></div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <span class="section-label">Initial State &amp; Source</span>
+                            <div class="field-group">
+                                <div class="field-header"><span>Initial Profile u(x,0)</span></div>
+                                <select class="select-input" id="heat-ic-select">
+                                    <option value="sine">Fundamental Sine sin(πx/L)</option>
+                                    <option value="harmonics">Multi-Mode Harmonics</option>
+                                    <option value="gaussian">Gaussian Thermal Pulse</option>
+                                    <option value="step">Heaviside Step Jump</option>
+                                    <option value="triangle">Triangular Peak</option>
+                                </select>
+                            </div>
+                            <div class="field-group">
+                                <div class="field-header"><span>Internal Forcing f</span></div>
+                                <select class="select-input" id="heat-forcing-select">
+                                    <option value="none">Homogeneous (f = 0)</option>
+                                    <option value="center">Center Point Heater</option>
+                                    <option value="uniform">Uniform Volumetric Source</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <span class="section-label">Display &amp; Playback</span>
+                            <label class="checkbox-row">
+                                <span>Show heat flux arrows</span>
+                                <input type="checkbox" id="heat-chk-vectors" checked>
+                            </label>
+                            <div class="speed-pills" id="heat-speed-pills">
+                                <button class="speed-pill" data-speed="1">1×</button>
+                                <button class="speed-pill active" data-speed="3">3×</button>
+                                <button class="speed-pill" data-speed="8">8×</button>
+                                <button class="speed-pill" data-speed="20">20×</button>
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" id="heat-play-btn">
+                                    <i data-lucide="play"></i><span>Play</span>
+                                </button>
+                                <button class="btn" id="heat-reset-btn">
+                                    <i data-lucide="rotate-ccw"></i><span>Reset</span>
+                                </button>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <div class="main-column">
+                        <div class="panel-card stage-card">
+                            <div class="stage-top">
+                                <span class="stage-title" id="heat-stage-title">1D Thin Rod Thermal Diffusion</span>
+                                <span class="stage-eq-pill katex-inline" id="heat-eq-display" data-tex="\frac{\partial u}{\partial t} = \beta\frac{\partial^2 u}{\partial x^2}">∂u/∂t = β ∂²u/∂x²</span>
+                            </div>
+                            <div class="canvas-wrap">
+                                <canvas id="heat-canvas"></canvas>
+                                <div class="steady-banner" id="heat-steady-banner">
+                                    <span>Equilibrium reached</span>
+                                    <button class="btn btn-sm btn-primary" id="heat-replay-btn">Replay</button>
+                                </div>
+                            </div>
+                            <div class="stage-footer">
+                                <div class="legend-strip">
+                                    <span id="heat-min-lbl">0.00</span>
+                                    <div class="legend-bar" id="heat-legend-bar" style="background: linear-gradient(90deg, #2e1065, #5b21b6, #9333ea, #db2777, #dc2626);"></div>
+                                    <span id="heat-max-lbl">1.00</span>
+                                </div>
+                                <div class="stats-row">
+                                    <div class="stat-pill"><span class="stat-k">Time t</span><span class="stat-v" id="heat-stat-t">0.000 s</span></div>
+                                    <div class="stat-pill"><span class="stat-k">Steps</span><span class="stat-v" id="heat-stat-steps">0</span></div>
+                                    <div class="stat-pill"><span class="stat-k">Max |∂u/∂t|</span><span class="stat-v" id="heat-stat-dt">—</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="charts-2col">
+                            <div class="panel-card chart-card">
+                                <div class="chart-card-head">
+                                    <h3 id="heat-plot1-title">Spatial Profile u(x, t)</h3>
+                                    <span class="chart-sub">Drag to zoom · Double-click to reset</span>
+                                </div>
+                                <div id="heat-plot-1" class="plot-box"></div>
+                            </div>
+                            <div class="panel-card chart-card">
+                                <div class="chart-card-head">
+                                    <h3 id="heat-plot2-title">Spacetime Heatmap u(x, t)</h3>
+                                    <span class="chart-sub" id="heat-plot2-sub">Violet (cold) → Red (hot)</span>
+                                </div>
+                                <div id="heat-plot-2" class="plot-box"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-VIEW 2B: ANIMATED NUMERICAL SIMULATION -->
+            <div id="heat-pane-numerical" style="display:none;">
+                <div class="presets-row">
+                    <span class="presets-label">Scenarios</span>
+                    <button class="preset-chip active" data-num-preset="q6_unstable">Sine IC · λ = 1.0 (FTCS Blowup)</button>
+                    <button class="preset-chip" data-num-preset="q6_stable">Sine IC · λ = 0.25 (All Stable)</button>
+                    <button class="preset-chip" data-num-preset="w6_instability">Instability Threshold (λ = 0.735)</button>
+                    <button class="preset-chip" data-num-preset="w7_rod">Heated Rod (T₀ = 100, T_L = 50)</button>
+                    <button class="preset-chip" data-num-preset="step_diff">Step Discontinuity (λ = 0.40)</button>
+                </div>
+
+                <div class="workspace-grid">
+                    <aside class="panel-card controls-sidebar">
+                        <div class="stability-card unstable" id="num-stability-card">
+                            <div class="stability-top">
+                                <span id="num-lambda-text">λ = 1.000</span>
+                                <span id="num-stability-badge">FTCS Unstable</span>
+                            </div>
+                            <span class="stability-desc" id="num-stability-desc">λ &gt; 0.5 violates Explicit FTCS stability. BTCS &amp; Crank–Nicolson remain stable.</span>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <span class="section-label">Discretization Parameters</span>
+                            <div class="field-group">
+                                <div class="field-header"><span>Grid Intervals N</span><span class="field-value" id="num-nx-val">10 (Δx = 0.100)</span></div>
+                                <input type="range" id="num-nx-slider" min="5" max="30" step="1" value="10">
+                            </div>
+                            <div class="field-group">
+                                <div class="field-header"><span>Time Step Δt</span><span class="field-value" id="num-dt-val">0.0100</span></div>
+                                <input type="range" id="num-dt-slider" min="0.001" max="0.03" step="0.0005" value="0.01">
+                            </div>
+                            <div class="field-group">
+                                <div class="field-header"><span>Diffusivity β</span><span class="field-value" id="num-beta-val">1.00</span></div>
+                                <input type="range" id="num-beta-slider" min="0.2" max="2.0" step="0.05" value="1.0">
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <span class="section-label">Simulated Schemes</span>
+                            <div class="scheme-toggles">
+                                <label class="scheme-chip">
+                                    <span class="scheme-left"><span class="swatch" style="background:#0f172a;"></span>Exact Analytical</span>
+                                    <input type="checkbox" id="chk-exact" checked>
+                                </label>
+                                <label class="scheme-chip">
+                                    <span class="scheme-left"><span class="swatch" style="background:#dc2626;"></span>Explicit FTCS</span>
+                                    <input type="checkbox" id="chk-ftcs" checked>
+                                </label>
+                                <label class="scheme-chip">
+                                    <span class="scheme-left"><span class="swatch" style="background:#0284c7;"></span>Simple Implicit BTCS</span>
+                                    <input type="checkbox" id="chk-btcs" checked>
+                                </label>
+                                <label class="scheme-chip">
+                                    <span class="scheme-left"><span class="swatch" style="background:#059669;"></span>Crank–Nicolson</span>
+                                    <input type="checkbox" id="chk-cn" checked>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <span class="section-label">Simulation Playback</span>
+                            <div class="speed-pills" id="num-speed-pills">
+                                <button class="speed-pill" data-ms="750">Slow</button>
+                                <button class="speed-pill active" data-ms="350">1×</button>
+                                <button class="speed-pill" data-ms="150">2×</button>
+                                <button class="speed-pill" data-ms="65">4×</button>
+                            </div>
+                            <button class="btn btn-primary" id="num-play-btn" style="width:100%;">
+                                <i data-lucide="play"></i><span>Play Simulation</span>
+                            </button>
+                            <div class="btn-row-3">
+                                <button class="btn" id="num-step1-btn">Step +1</button>
+                                <button class="btn" id="num-step5-btn">Step +5</button>
+                                <button class="btn" id="num-reset-btn">Reset</button>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <div class="main-column">
+                        <div class="panel-card stage-card">
+                            <div class="stage-top">
+                                <span class="stage-title">Live Discrete-Node Rod Simulation (Side-by-Side)</span>
+                                <span class="chart-sub">Yellow outline = numerical overshoot / instability</span>
+                            </div>
+                            <div class="num-canvas-wrap">
+                                <canvas id="num-canvas"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="panel-card chart-card">
+                            <div class="chart-card-head">
+                                <h3 id="num-main-title">Time-Step Comparison — Step l = 0 (t = 0.0000)</h3>
+                                <span class="chart-sub">Drag to zoom · Double-click to reset</span>
+                            </div>
+                            <div id="num-plot-compare" class="plot-box-tall"></div>
+                        </div>
+
+                        <div class="charts-2col">
+                            <div class="panel-card chart-card">
+                                <div class="chart-card-head">
+                                    <h3>Max Absolute Error vs Time Step</h3>
+                                    <span class="chart-sub">maxᵢ |uᵢˡ − u_exact(xᵢ, tˡ)|</span>
+                                </div>
+                                <div id="num-plot-error" class="plot-box"></div>
+                            </div>
+                            <div class="panel-card chart-card">
+                                <div class="chart-card-head">
+                                    <h3>Nodal Values at Current Step</h3>
+                                    <span class="chart-sub">Live grid readout</span>
+                                </div>
+                                <div class="node-table-wrap">
+                                    <table class="node-table">
+                                        <thead>
+                                            <tr>
+                                                <th>xᵢ</th>
+                                                <th>Exact</th>
+                                                <th>FTCS</th>
+                                                <th>BTCS</th>
+                                                <th>Crank–Nic.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="num-node-tbody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="formulas-3col">
+                            <div class="formula-mini-card">
+                                <h4><span>Explicit FTCS</span><span class="formula-order">O(Δt + Δx²)</span></h4>
+                                <div class="formula-math katex-inline" data-tex="T_i^{l+1} = \lambda T_{i-1}^l + (1-2\lambda)T_i^l + \lambda T_{i+1}^l">Tᵢˡ⁺¹ = λTᵢ₋₁ˡ + (1−2λ)Tᵢˡ + λTᵢ₊₁ˡ</div>
+                                <p class="formula-note">Conditionally stable: requires λ ≤ 0.5. Direct march forward; oscillates &amp; diverges if λ &gt; 0.5.</p>
+                            </div>
+                            <div class="formula-mini-card">
+                                <h4><span>Simple Implicit BTCS</span><span class="formula-order">O(Δt + Δx²)</span></h4>
+                                <div class="formula-math katex-inline" data-tex="-\lambda T_{i-1}^{l+1} + (1+2\lambda)T_i^{l+1} - \lambda T_{i+1}^{l+1} = T_i^l">−λTᵢ₋₁ˡ⁺¹ + (1+2λ)Tᵢˡ⁺¹ − λTᵢ₊₁ˡ⁺¹ = Tᵢˡ</div>
+                                <p class="formula-note">Unconditionally stable for all λ &gt; 0. Solves a tridiagonal system via O(N) Thomas algorithm each step.</p>
+                            </div>
+                            <div class="formula-mini-card">
+                                <h4><span>Crank–Nicolson</span><span class="formula-order">O(Δt² + Δx²)</span></h4>
+                                <div class="formula-math katex-inline" data-tex="-\lambda T_{i-1}^{l+1} + 2(1+\lambda)T_i^{l+1} - \lambda T_{i+1}^{l+1} = \text{RHS}^l">−λTᵢ₋₁ˡ⁺¹ + 2(1+λ)Tᵢˡ⁺¹ − λTᵢ₊₁ˡ⁺¹ = RHSˡ</div>
+                                <p class="formula-note">Unconditionally stable and 2nd-order accurate in both space &amp; time by averaging levels l and l+1.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             VIEW 3: WAVE EQUATION STUDIO
+             ================================================================ -->
+        <section id="view-wave" class="view-section">
+            <div class="view-header">
+                <div class="view-title-group">
+                    <h1>Wave Equation Simulator</h1>
+                    <p>Hyperbolic string vibrations, standing normal modes, D'Alembert traveling waves &amp; shaded 2D water ripples.</p>
+                </div>
+            </div>
+
+            <div class="presets-row">
+                <span class="presets-label">Presets</span>
+                <button class="preset-chip active" data-wave-preset="plucked">Plucked String</button>
+                <button class="preset-chip" data-wave-preset="mode1">Standing Mode n = 1</button>
+                <button class="preset-chip" data-wave-preset="mode3">Harmonic n = 3 (Nodes)</button>
+                <button class="preset-chip" data-wave-preset="dalembert">D'Alembert Pulse Split</button>
+                <button class="preset-chip" data-wave-preset="struck">Struck String (g(x) ≠ 0)</button>
+                <button class="preset-chip" data-wave-preset="mem_drop">2D Stone-in-Water Ripple</button>
+                <button class="preset-chip" data-wave-preset="mem_mode">2D Membrane Mode (2,3)</button>
+            </div>
+
+            <div class="workspace-grid">
+                <aside class="panel-card controls-sidebar">
+                    <div class="sidebar-section">
+                        <span class="section-label">Domain &amp; Wave Speed</span>
+                        <div class="toggle-pair" id="wave-dim-toggle">
+                            <button class="toggle-btn active" data-value="1d">1D String</button>
+                            <button class="toggle-btn" data-value="2d">2D Surface</button>
+                        </div>
+                        <div class="field-group">
+                            <div class="field-header"><span>Wave Speed c</span><span class="field-value" id="wave-c-val">1.00</span></div>
+                            <input type="range" id="wave-c-slider" min="0.3" max="2.5" step="0.1" value="1.0">
+                        </div>
+                        <div class="field-group">
+                            <div class="field-header"><span>Damping γ</span><span class="field-value" id="wave-damp-val">0.00</span></div>
+                            <input type="range" id="wave-damp-slider" min="0" max="0.3" step="0.02" value="0">
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <span class="section-label">Boundary &amp; Initial Conditions</span>
+                        <div class="field-group">
+                            <div class="field-header"><span>Boundary Condition</span></div>
+                            <select class="select-input" id="wave-bc-select">
+                                <option value="dirichlet">Dirichlet (Fixed Ends u = 0)</option>
+                                <option value="neumann">Neumann (Free Ends ∂u/∂n = 0)</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <div class="field-header"><span>Initial Shape f(x)</span></div>
+                            <select class="select-input" id="wave-ic-select">
+                                <option value="plucked">Plucked Triangle</option>
+                                <option value="sine">Fundamental Sine (n = 1)</option>
+                                <option value="mode">Normal Mode (m, n)</option>
+                                <option value="superposition">Multi-Mode / Dual Drop</option>
+                                <option value="gaussian">Gaussian Pulse / Stone Drop</option>
+                                <option value="zero">Flat String (Struck)</option>
+                            </select>
+                        </div>
+                        <div class="bc-grid" id="wave-mode-controls" style="display:none;">
+                            <div class="bc-mini-field">
+                                <label for="wave-mode-m">Mode m</label>
+                                <input class="num-input" type="number" id="wave-mode-m" min="1" max="6" value="3">
+                            </div>
+                            <div class="bc-mini-field" id="wave-mode-n-wrap">
+                                <label for="wave-mode-n">Mode n (2D)</label>
+                                <input class="num-input" type="number" id="wave-mode-n" min="1" max="6" value="3">
+                            </div>
+                        </div>
+                        <div class="field-group" id="wave-vel-group">
+                            <div class="field-header"><span>Initial Velocity g(x)</span></div>
+                            <select class="select-input" id="wave-vel-select">
+                                <option value="zero">Zero Velocity (Released)</option>
+                                <option value="impulse">Central Hammer Impulse</option>
+                                <option value="sine_vel">Sinusoidal Velocity</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section" id="wave-overlays-section">
+                        <span class="section-label">1D Analytical Overlays</span>
+                        <label class="checkbox-row" id="wave-dalembert-row">
+                            <span>D'Alembert ½f(x±ct) waves</span>
+                            <input type="checkbox" id="wave-chk-dalembert" checked>
+                        </label>
+                        <label class="checkbox-row" id="wave-nodes-row" style="display:none;">
+                            <span>Standing-wave node dots</span>
+                            <input type="checkbox" id="wave-chk-nodes" checked>
+                        </label>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <span class="section-label">Playback</span>
+                        <div class="speed-pills" id="wave-speed-pills">
+                            <button class="speed-pill" data-speed="1">0.5×</button>
+                            <button class="speed-pill active" data-speed="2">1×</button>
+                            <button class="speed-pill" data-speed="4">2×</button>
+                            <button class="speed-pill" data-speed="8">4×</button>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" id="wave-play-btn">
+                                <i data-lucide="play"></i><span>Play</span>
+                            </button>
+                            <button class="btn" id="wave-reset-btn">
+                                <i data-lucide="rotate-ccw"></i><span>Reset</span>
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="main-column">
+                    <div class="panel-card stage-card">
+                        <div class="stage-top">
+                            <span class="stage-title" id="wave-stage-title">1D Vibrating String</span>
+                            <span class="stage-eq-pill katex-inline" id="wave-eq-display" data-tex="\frac{\partial^2 u}{\partial t^2} = c^2\frac{\partial^2 u}{\partial x^2}">∂²u/∂t² = c² ∂²u/∂x²</span>
+                        </div>
+                        <div class="canvas-wrap">
+                            <canvas id="wave-canvas"></canvas>
+                        </div>
+                        <div class="stage-footer">
+                            <div class="legend-strip" id="wave-legend-info">
+                                <span>Fundamental freq f₁ = c / (2L)</span>
+                            </div>
+                            <div class="stats-row">
+                                <div class="stat-pill"><span class="stat-k">Time t</span><span class="stat-v" id="wave-stat-t">0.000 s</span></div>
+                                <div class="stat-pill"><span class="stat-k">Steps</span><span class="stat-v" id="wave-stat-steps">0</span></div>
+                                <div class="stat-pill"><span class="stat-k">CFL (cΔt/Δx)</span><span class="stat-v" id="wave-stat-cfl">0.65</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-2col">
+                        <div class="panel-card chart-card">
+                            <div class="chart-card-head">
+                                <h3 id="wave-plot1-title">Spacetime Characteristics u(x, t)</h3>
+                                <span class="chart-sub" id="wave-plot1-sub">Diagonal wave rays x ± ct</span>
+                            </div>
+                            <div id="wave-plot-1" class="plot-box"></div>
+                        </div>
+                        <div class="panel-card chart-card">
+                            <div class="chart-card-head">
+                                <h3 id="wave-plot2-title">Mechanical Energy Conservation</h3>
+                                <span class="chart-sub" id="wave-plot2-sub">Kinetic, Potential &amp; Total</span>
+                            </div>
+                            <div id="wave-plot-2" class="plot-box"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             VIEW 4: GRAPHS GALLERY
+             ================================================================ -->
+        <section id="view-graphs" class="view-section">
+            <div class="view-header">
+                <div class="view-title-group">
+                    <h1>Graphs &amp; Python Scripts</h1>
+                    <p>Essential Heat, Wave, Fourier, and Finite Difference visualizations. Click .py beside any figure to download runnable Matplotlib code.</p>
+                </div>
+                <div class="segmented-tabs" id="graphs-filter-tabs">
+                    <button class="seg-tab active" data-filter="all">All (13)</button>
+                    <button class="seg-tab" data-filter="heat">Heat (5)</button>
+                    <button class="seg-tab" data-filter="wave">Wave (5)</button>
+                    <button class="seg-tab" data-filter="fourier_fd">Fourier &amp; FD (3)</button>
+                </div>
+            </div>
+
+            <div class="graphs-gallery-grid" id="graphs-gallery-grid"></div>
+        </section>
+
+    </main>
+
+    <!-- CODE PREVIEW MODAL -->
+    <div class="modal-backdrop" id="code-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3 id="modal-title">script.py</h3>
+                <button class="btn btn-sm" id="modal-close-btn">Close</button>
+            </div>
+            <div class="modal-body">
+                <pre id="modal-code-pre"></pre>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-sm" id="modal-copy-btn">
+                    <i data-lucide="copy"></i><span>Copy Code</span>
+                </button>
+                <button class="btn btn-sm btn-primary" id="modal-download-btn">
+                    <i data-lucide="download"></i><span>Download .py</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="js/heat-solver.js"></script>
+    <script src="js/heat-numerical.js"></script>
+    <script src="js/wave-solver.js"></script>
+    <script src="js/renderers.js"></script>
+    <script src="js/graphs-data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zashraf-io.github.io/pde-playground/sitemap.xml

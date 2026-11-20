@@ -1,0 +1,11 @@
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python artifacts (when running downloaded graph scripts locally)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
